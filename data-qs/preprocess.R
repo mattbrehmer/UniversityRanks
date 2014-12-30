@@ -46,10 +46,18 @@ qsJoined$rank_14 = findInterval(qsJoined$rank_14, sort(unique(qsJoined$rank_14))
 qsJoined$rank_13 = findInterval(qsJoined$rank_13, sort(unique(qsJoined$rank_13)))
 qsJoined$rank_12  = findInterval(qsJoined$rank_12, sort(unique(qsJoined$rank_12)))
 
-setnames(qsJoined,"overall_score_14","score_14")
-setnames(qsJoined,"overall_score_13","score_13")
-setnames(qsJoined,"overall_score_12","score_12")
+setnames(qsJoined,"overall_score_14","score_2014")
+setnames(qsJoined,"overall_score_13","score_2013")
+setnames(qsJoined,"overall_score_12","score_2012")
 
-qsJoined = qsJoined[order(rank_14)]
+qsJoined = transform(qsJoined, score=apply(qsJoined[,8:10, with = F],1, mean, na.rm = TRUE))
+qsJoined = transform(qsJoined, rank=apply(qsJoined[,11:13, with = F],1, mean, na.rm = TRUE))
+qsJoined$rank  = findInterval(qsJoined$score, sort(unique(qsJoined$score)))
+qsJoined$rank = rank(-qsJoined$rank)
+qsJoined$rank  = findInterval(qsJoined$rank, sort(unique(qsJoined$rank)))
+
+qsJoined$score = round(qsJoined$score,1)
+
+qsJoined = qsJoined[order(score,decreasing = T)]
 
 write.csv(qsJoined,file="qsScores.csv",quote=F,row.names=T,na="")
