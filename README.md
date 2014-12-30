@@ -1,4 +1,4 @@
 UniversityRanks
 ===============
 
-a visualization of annual University Rankings, according to data published by QS topuniversities.com
+A visualization of annual University Rankings, according to data published by QS topuniversities.com
