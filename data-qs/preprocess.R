@@ -87,4 +87,4 @@ qsJoined = subset(qsJoined, select=-c(
 
 setnames(qsJoined,"country_name","country")
 
-write.csv(qsJoined,file="qsScores.csv",quote=F,row.names=T,na="")
+write.csv(qsJoined,file="qsScores.csv",quote=T,row.names=T,na="")
