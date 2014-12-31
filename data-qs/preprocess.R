@@ -1,4 +1,5 @@
 require(data.table)
+source("preprocess-iso-names.R")
 
 #load files
 qs2012 = as.data.table(read.csv(file = "qs12.csv",stringsAsFactors=TRUE))
@@ -59,5 +60,31 @@ qsJoined$rank  = findInterval(qsJoined$rank, sort(unique(qsJoined$rank)))
 qsJoined$score = round(qsJoined$score,1)
 
 qsJoined = qsJoined[order(score,decreasing = T)]
+
+qsJoined$focus = gsub("FC","Full Comprehensive",qsJoined$focus)
+qsJoined$focus = gsub("CO","Comprehensive",qsJoined$focus)
+qsJoined$focus = gsub("FO","Focused",qsJoined$focus)
+qsJoined$focus = gsub("SP","Specialist",qsJoined$focus)
+
+qsJoined$research = gsub("VH","Very High",qsJoined$research)
+qsJoined$research = gsub("HI","High",qsJoined$research)
+qsJoined$research = gsub("MD","Medium",qsJoined$research)
+qsJoined$research = gsub("LO","Low",qsJoined$research)
+
+qsJoined$age = gsub("1","New",qsJoined$age)
+qsJoined$age = gsub("2","Young",qsJoined$age)
+qsJoined$age = gsub("3","Established",qsJoined$age)
+qsJoined$age = gsub("4","Mature",qsJoined$age)
+qsJoined$age = gsub("5","Historic",qsJoined$age)
+
+qsJoined$country = gsub("UK","GB",qsJoined$country)
+qsJoined$country_name = do.call("rbind", lapply(X=qsJoined$country,FUN = getCountryCode))
+
+#subset to attributes of interest
+qsJoined = subset(qsJoined, select=-c(
+  country
+))
+
+setnames(qsJoined,"country_name","country")
 
 write.csv(qsJoined,file="qsScores.csv",quote=F,row.names=T,na="")
