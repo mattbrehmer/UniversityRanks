@@ -94,8 +94,8 @@ body {
 
 .link_line {
   stroke: #bbb;
-  opacity: 0.25;
-  stroke-width: 1px;
+  opacity: 0.5;
+  stroke-width: 2px;
 }
 
 .column {

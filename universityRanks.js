@@ -36,7 +36,10 @@ var x = d3.scale.ordinal(),
     y = d3.scale.linear(), //scales for each dimension
     z = d3.scale.linear(), //scale for bar charts
     country_scale = d3.scale.ordinal(), //ordinal scale for countries
-    size_scale = d3.scale.ordinal(); //ordinal scale for size
+    size_scale = d3.scale.ordinal(), //ordinal scale for size
+    research_scale = d3.scale.ordinal(),  //ordinal scale for research
+    age_scale = d3.scale.ordinal(), //ordinal scale for age
+    focus_scale = d3.scale.ordinal(); //ordinal scale for focus
 
 //initialize dispatch for highlighting selections from dropdowns
 var dispatch = d3.dispatch("highlight");                  
@@ -101,15 +104,20 @@ tooltip_svg.append("text")
 tooltip_svg.append("text")
            .attr("dy", "5.9em")
            .attr("dx", "0.3em")
-           .attr("id","tooltip_research");     
+           .attr("id","tooltip_research");   
 
 tooltip_svg.append("text")
-          .attr("dy", "7.9em")
+          .attr("dy", "6.9em")
+          .attr("dx", "0.3em")
+          .attr("id","tooltip_age");                
+
+tooltip_svg.append("text")
+          .attr("dy", "8.9em")
           .attr("dx", "0.3em")
           .attr("id","tooltip_rank");   
 
 tooltip_svg.append("text")
-          .attr("dy", "8.9em")
+          .attr("dy", "9.9em")
           .attr("dx", "0.3em")
           .attr("id","tooltip_score");                                            
 
@@ -131,7 +139,7 @@ var about_panel = d3.select("body")
                       '<br/><br/><strong>Interaction</strong>: Hover over a university to highlight the ranks and scores across all of the years, and to see details about the univiersity (such as country, size, and research focus) in the panel at the lower left. ' + 
                       '<br/><br/>You can also hover over any cell. ' + 
                       'Clicking on a cell makes the highlighting persist, which can facilitate comparisons between universities. Clicking again removes the highlight. ' +
-                      '<br/><br/><strong>Country / University Size Filtering</strong>: Select a musical genre and / or record label from the dropdown boxes in the lower left to filter the list of universities (filtering maintains the relative rank positions of scores). ' +
+                      '<br/><br/><strong>Metadata Filtering</strong>: Select a sountry, institution size, research level, focus level, or institution age from the dropdown boxes in the lower left to filter the list of universities (filtering maintains the relative rank positions of scores). ' +
                       '<br/><br/>(Click anywhere in this panel to close it.)');
               
 //create an array of known rank dimensions              
@@ -171,6 +179,21 @@ d3.csv("qsScores.csv", function(error, data) {
   //specify size scale domain
   size_scale.domain(data.map( function (d) { 
     return d.size; 
+  }));
+
+  //specify research scale domain
+  research_scale.domain(data.map( function (d) { 
+    return d.research; 
+  }));
+
+  //specify focus scale domain
+  focus_scale.domain(data.map( function (d) { 
+    return d.focus; 
+  }));
+
+  //specify age scale domain
+  age_scale.domain(data.map( function (d) { 
+    return d.age; 
   }));
 
   /**
@@ -293,16 +316,19 @@ d3.csv("qsScores.csv", function(error, data) {
                     .text(d.institution);                  
                   d3.select("#tooltip_country")
                     .transition()
-                    .text(d.country);                  
+                    .text("Country: " + d.country);                  
                   d3.select("#tooltip_focus")
                     .transition()
                     .text("Focus: " + d.focus);
                   d3.select("#tooltip_size")
                     .transition()
-                    .text("Size: " + d.size);
+                    .text("Institution Size: " + d.size);
                   d3.select("#tooltip_research")
                     .transition()
-                    .text("Rsearch: " + d.research);
+                    .text("Research: " + d.research);
+                  d3.select("#tooltip_age")
+                    .transition()
+                    .text("Age: " + d.age);
                   d3.select("#tooltip_rank")
                     .transition()
                     .text("Rank / 2014: " + ((d.rank_14 != '') ? d.rank_14 : 'N/A') + "; " + 
@@ -697,50 +723,37 @@ d3.csv("qsScores.csv", function(error, data) {
       });
     
   //listen for dispatch events from selectors
-  dispatch.on("highlight.row", function(country,size) {
-    // row.selectAll('.institution').style("opacity", function(d){
-    //   if ((d.country == country || country == "( All Countries )") && 
-    //       (d.size == size || size == "(  All Institution Sizes )"))
-    //     return 1;
-    //   else 
-    //     return 0.25;
-    // });  
-    // row.selectAll('.country').style("opacity", function(d){
-    //   if ((d.country == country || country == "( All Countries )") && 
-    //       (d.size == size || size == "(  All Institution Sizes )"))
-    //     return 1;
-    //   else 
-    //     return 0.25;
-    // });  
+  dispatch.on("highlight.row", function(country,size,research,focus,age) {
     row.style("opacity", function(d){
       if ((d.country == country || country == "( All Countries )") && 
-          (d.size == size || size == "(  All Institution Sizes )"))
+          (d.size == size || size == "( All Sizes )") &&
+          (d.research == research || research == "( All Research )") && 
+          (d.focus == focus || focus == "( All Focus )") &&
+          (d.age == age || age == "( All Ages )"))
         return 1;
       else 
-        return 0.2;
+        return 0.15;
     });    
     row.style("pointer-events", function(d){
       if ((d.country == country || country == "( All Countries )") && 
-          (d.size == size || size == "(  All Institution Sizes )"))
+          (d.size == size || size == "( All Sizes )") &&
+          (d.research == research || research == "( All Research )") && 
+          (d.focus == focus || focus == "( All Focus )") &&
+          (d.age == age || age == "( All Ages )"))
         return 'inherit';
       else 
         return 'none';
     }); 
     row.sort(function (d, a) { // select the parent and sort the path's
       if ((d.country == country || country == "( All Countries )") && 
-          (d.size == size || size == "(  All Institution Sizes )"))
+          (d.size == size || size == "( All Sizes )") &&
+          (d.research == research || research == "( All Research )") && 
+          (d.focus == focus || focus == "( All Focus )") &&
+          (d.age == age || age == "( All Ages )"))
         return 1; // a is not the hovered element, send "a" to the back
       else 
         return -1; // a is the hovered element, bring "a" to the front
-    });
-
-    // row.selectAll('.cell').style("display", function(d){
-    //   if ((d3.select(this.parentNode).datum().country == country || country == "( All Countries )") && 
-    //       (d3.select(this.parentNode).datum().size == size || size == "(  All Institution Sizes )"))
-    //     return 'inline';
-    //   else 
-    //     return 'none';
-    // });    
+    }); 
   });
 
   /**
@@ -827,7 +840,7 @@ d3.csv("qsScores.csv", function(error, data) {
         .text("More info");
 
   d3.select("#filter_div")
-    .html("Filter by country or institution size: ")
+    .html("Filter by: ")
 
   var all_countries = ["( All Countries )"];
 
@@ -845,7 +858,7 @@ d3.csv("qsScores.csv", function(error, data) {
                 return d; 
                });     
   
-  var all_sizes = ["(  All Institution Sizes )"];
+  var all_sizes = ["( All Sizes )"];
 
   //append size dropdown to footer, 
   var select_size = d3.select("#filter_div")
@@ -861,14 +874,68 @@ d3.csv("qsScores.csv", function(error, data) {
                 return d; 
                });
 
+  var all_research = ["( All Research )"];
+
+  //append research dropdown to footer, 
+  var select_research = d3.select("#filter_div")
+                          .append("select")
+                          .on("change", dropdownChange),
+      research_options = select_research.selectAll("option")
+                                        .data(all_research.concat(research_scale.domain().sort()));
+
+  //populate researcg dropdown with research levels 
+  research_options.enter()
+                 .append("option")
+                 .text(function (d) { 
+                   return d; 
+                 });                  
+
+  var all_focus = ["( All Focus )"];
+
+  //append focus dropdown to footer, 
+  var select_focus = d3.select("#filter_div")
+                       .append("select")
+                       .on("change", dropdownChange),
+      focus_options = select_focus.selectAll("option")
+                                  .data(all_focus.concat(focus_scale.domain().sort()));
+
+  //populate focus dropdown with focus levels 
+  focus_options.enter()
+               .append("option")
+               .text(function (d) { 
+                return d; 
+               });  
+
+  var all_ages = ["( All Ages )"];
+
+  //append age dropdown to footer, 
+  var select_age = d3.select("#filter_div")
+                       .append("select")
+                       .on("change", dropdownChange),
+      age_options = select_age.selectAll("option")
+                              .data(all_ages.concat(age_scale.domain().sort()));
+
+  //populate age dropdown with age levels 
+  age_options.enter()
+               .append("option")
+               .text(function (d) { 
+                return d; 
+               });                       
+
   //whenever an option is selected from the dropdowns, issue a dispatch event 
   function dropdownChange() {
     var selected_country_index = select_country.property("selectedIndex"),
         selected_country = country_options[0][selected_country_index].__data__,
         selected_size_index = select_size.property("selectedIndex"),
-        selected_size = size_options[0][selected_size_index].__data__; //consensus upper and lower bounds
+        selected_size = size_options[0][selected_size_index].__data__,
+        selected_research_index = select_research.property("selectedIndex"),
+        selected_research = research_options[0][selected_research_index].__data__,
+        selected_focus_index = select_focus.property("selectedIndex"),
+        selected_focus = focus_options[0][selected_focus_index].__data__
+        selected_age_index = select_age.property("selectedIndex"),
+        selected_age = age_options[0][selected_age_index].__data__;
 
-    dispatch.highlight(selected_country,selected_size);
+    dispatch.highlight(selected_country,selected_size,selected_research,selected_focus,selected_age);
   } 
 
 }); //end d3.csv load
