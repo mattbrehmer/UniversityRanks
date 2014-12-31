@@ -35,11 +35,7 @@ var margin = {top: 20, right: 20, bottom: 20, left: 20},
 var x = d3.scale.ordinal(),
     y = d3.scale.linear(), //scales for each dimension
     z = d3.scale.linear(), //scale for bar charts
-    country_scale = d3.scale.ordinal(), //ordinal scale for countries
-    size_scale = d3.scale.ordinal(), //ordinal scale for size
-    research_scale = d3.scale.ordinal(),  //ordinal scale for research
-    age_scale = d3.scale.ordinal(), //ordinal scale for age
-    focus_scale = d3.scale.ordinal(); //ordinal scale for focus
+    country_scale = d3.scale.ordinal(); //ordinal scale for country
 
 //initialize dispatch for highlighting selections from dropdowns
 var dispatch = d3.dispatch("highlight");                  
@@ -174,26 +170,6 @@ d3.csv("qsScores.csv", function(error, data) {
   //specify country scale domain
   country_scale.domain(data.map( function (d) { 
     return d.country; 
-  }));
-
-  //specify size scale domain
-  size_scale.domain(data.map( function (d) { 
-    return d.size; 
-  }));
-
-  //specify research scale domain
-  research_scale.domain(data.map( function (d) { 
-    return d.research; 
-  }));
-
-  //specify focus scale domain
-  focus_scale.domain(data.map( function (d) { 
-    return d.focus; 
-  }));
-
-  //specify age scale domain
-  age_scale.domain(data.map( function (d) { 
-    return d.age; 
   }));
 
   /**
@@ -858,14 +834,14 @@ d3.csv("qsScores.csv", function(error, data) {
                 return d; 
                });     
   
-  var all_sizes = ["( All Sizes )"];
+  var size_scale = ["( All Sizes )","S","M","L","XL"];
 
   //append size dropdown to footer, 
   var select_size = d3.select("#filter_div")
                       .append("select")
                       .on("change", dropdownChange),
       size_options = select_size.selectAll("option")
-                                .data(all_sizes.concat(size_scale.domain().sort()));
+                                .data(size_scale);
 
   //populate size dropdown with sizes
   size_options.enter()
@@ -874,14 +850,14 @@ d3.csv("qsScores.csv", function(error, data) {
                 return d; 
                });
 
-  var all_research = ["( All Research )"];
+  var research_scale = ["( All Research )","Low","Medium","High","Very High"];
 
   //append research dropdown to footer, 
   var select_research = d3.select("#filter_div")
                           .append("select")
                           .on("change", dropdownChange),
       research_options = select_research.selectAll("option")
-                                        .data(all_research.concat(research_scale.domain().sort()));
+                                        .data(research_scale);
 
   //populate researcg dropdown with research levels 
   research_options.enter()
@@ -890,14 +866,14 @@ d3.csv("qsScores.csv", function(error, data) {
                    return d; 
                  });                  
 
-  var all_focus = ["( All Focus )"];
+  var focus_scale = ["( All Focus )","Specialist","Focused","Comprehensive","Full Comprehensive"];
 
   //append focus dropdown to footer, 
   var select_focus = d3.select("#filter_div")
                        .append("select")
                        .on("change", dropdownChange),
       focus_options = select_focus.selectAll("option")
-                                  .data(all_focus.concat(focus_scale.domain().sort()));
+                                  .data(focus_scale);
 
   //populate focus dropdown with focus levels 
   focus_options.enter()
@@ -906,14 +882,14 @@ d3.csv("qsScores.csv", function(error, data) {
                 return d; 
                });  
 
-  var all_ages = ["( All Ages )"];
+  var age_scale = ["( All Ages )","Young","Established","Mature","Historic"];
 
   //append age dropdown to footer, 
   var select_age = d3.select("#filter_div")
                        .append("select")
                        .on("change", dropdownChange),
       age_options = select_age.selectAll("option")
-                              .data(all_ages.concat(age_scale.domain().sort()));
+                              .data(age_scale);
 
   //populate age dropdown with age levels 
   age_options.enter()
